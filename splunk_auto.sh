@@ -195,7 +195,13 @@ configure_indexer() {
   # Enable receiving on 9997 for forwarders
   log "Enabling receiver on port $SPLUNK_RECEIVER_PORT ..."
   splunk_cmd enable listen "$SPLUNK_RECEIVER_PORT" -auth "$SPLUNK_ADMIN_USER:$SPLUNK_ADMIN_PASS"
+  
+  # Disable Web UI on indexer (recommended in distributed mode)
+  log "Disabling Web UI on indexer..."
+  splunk_cmd disable webserver -auth "$SPLUNK_ADMIN_USER:$SPLUNK_ADMIN_PASS"
 
+  # Restart to apply web disable cleanly
+  splunk_cmd restart
   # (Optional) Basic hardening/limits could be added here (ulimits, THP, etc.)
   log "Indexer configured."
 }
