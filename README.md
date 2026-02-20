@@ -311,6 +311,70 @@ Architecture can be extended to clustering and high availability as needed.
 
 ---
 
+# 8️⃣ Uninstall Instructions (Full Removal)
+
+Use this when you want Splunk completely removed from the server.
+
+## What the uninstall does
+
+- Stops Splunk cleanly (CLI + systemd best-effort)
+- Disables the Splunk systemd service
+- Removes the Splunk installation directory (default: `/opt/splunk`)
+- Optionally removes the `splunk` user and group
+
+## How to run
+
+1. Ensure you have the uninstall script available in the repo as `uninstall_splunk.sh`.
+2. Make it executable:
+   - `chmod +x uninstall_splunk.sh`
+3. Run (keep user/group):
+   - `sudo ./uninstall_splunk.sh`
+4. Run (also remove `splunk` user/group):
+   - `sudo REMOVE_USER_GROUP=true ./uninstall_splunk.sh`
+
+## After uninstall
+
+- If you opened firewall ports (8000/8089/9997), remove rules according to your environment.
+- Verify removal:
+  - `/opt/splunk/bin/splunk` should not exist
+  - `systemctl status splunk` should show not found/disabled
+
+---
+
+# 9️⃣ Update / Upgrade Instructions
+
+Use this when you want to upgrade Splunk to a newer version using the `.tgz` method.
+
+## Recommended upgrade flow
+
+1. Backup configs and data (at least `etc/` and relevant parts of `var/`).
+2. Stop Splunk.
+3. Extract the new Splunk `.tgz` over the existing install location.
+4. Start Splunk and accept license prompts if needed.
+5. Validate version, service health, and search/indexing.
+
+## How to run
+
+1. Ensure you have the upgrade script available in the repo as `upgrade_splunk.sh`.
+2. Make it executable:
+   - `chmod +x upgrade_splunk.sh`
+3. Upgrade using a local tgz path:
+   - `sudo NEW_SPLUNK_TGZ=/path/to/new-splunk.tgz ./upgrade_splunk.sh`
+4. Upgrade using a URL:
+   - `sudo NEW_SPLUNK_TGZ_URL='https://.../splunk-new.tgz' ./upgrade_splunk.sh`
+
+## Post-upgrade validation checklist
+
+- Check service:
+  - `systemctl status splunk`
+- Confirm version:
+  - `/opt/splunk/bin/splunk version`
+- Verify Search Head ↔ Indexer connectivity (distributed mode):
+  - `/opt/splunk/bin/splunk list search-server`
+- Confirm data ingestion continues on indexer (9997) and UI works (8000)
+
+---
+
 End of Architecture Document
 
 
